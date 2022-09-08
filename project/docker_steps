@@ -1,0 +1,20 @@
+Create Dockerfile for 
+- Create dockerfile inside root dir of each project
+CartApi
+ProductApi
+FrontEnd
+
+CartApi
+Run Below command to create docker image inside Cartapi dir
+
+syntax: docker build -t dockerhub_username/image_name:tag
+    docker build -t ustapi/cartapi:0.1
+
+---
+ProductApi
+Run Below command to create docker image inside Productapi dir
+    docker build -t ustapi/product:0.1
+
+FrontEnd
+Run Below command to create docker image inside Productapi dir
+    docker build -t ustapi/frontend:0.1
