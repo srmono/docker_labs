@@ -8,13 +8,51 @@ CartApi
 Run Below command to create docker image inside Cartapi dir
 
 syntax: docker build -t dockerhub_username/image_name:tag
+
     docker build -t ustapi/cartapi:0.1
 
 ---
 ProductApi
 Run Below command to create docker image inside Productapi dir
-    docker build -t ustapi/product:0.1
+    docker build -t ustapi/productapi:0.1
 
 FrontEnd
 Run Below command to create docker image inside Productapi dir
     docker build -t ustapi/frontend:0.1
+
+------------------------
+Create repositories on docker hub:
+https://hub.docker.com/
+
+Create following repositories
+    cartapi
+    productapi
+    frontend
+
+-----------------
+Login to dockerhub from terminal
+
+docker login -u user_name
+
+docker login -u ustapi
+password: //enter password here
+
+Login is succeeded
+---------------
+
+Push all docker images to docker hub
+
+docker push ustapi/cartapi:0.1
+docker push ustapi/frontend:0.1
+docker push ustapi/productapi:0.1
+
+
+docker run -p 8081:8080 --name cart ustapi/cartapi:0.1
+
+--------------
+
+Scan docker images for vulnerabilities:
+
+docker scan imagename
+
+docker scan ustapi/cartapi:0.1

@@ -1,5 +1,5 @@
 #stage1: build artifact
-FROM maven:3.8.5.-jdk-8-slim AS builder
+FROM maven:3.8.5-jdk-8-slim AS builder
 COPY . /builder/
 WORKDIR /builder/
 RUN mvn clean package 
