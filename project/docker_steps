@@ -47,8 +47,6 @@ docker push ustapi/frontend:0.1
 docker push ustapi/productapi:0.1
 
 
-docker run -p 8081:8080 --name cart ustapi/cartapi:0.1
-
 --------------
 
 Scan docker images for vulnerabilities:
