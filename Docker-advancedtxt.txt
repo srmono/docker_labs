@@ -1,0 +1,378 @@
+Lab 1
+
+# touch Dockerfile 
+
+#vi Dockerfile 
+FROM alpine 
+CMD [“echo”, “hello world”] 
+
+
+#docker build -t helloworld:v1 . 
+
+#docker run --name helloworld helloworld:v1 
+
+# docker ps -a 
+
+#docker logs helloworld 
+
+
+Lab 2 : Passing Environment Variables
+
+#curl https://get.docker.com > install-docker.sh 
+#chmod 755 install-docker.sh 
+#sudo ./install-docker.sh 
+#docker -v 
+#sudo usermod -aG docker username 
+
+
+#exit 
+#docker container ls 
+
+#sudo curl -L https://github.com/docker/compose/releases/download/1.21.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose 
+
+#sudo chmod 755 /usr/local/bin/docker-compose 
+
+#sudo apt install -y git 
+
+#git clone https://github.com/chrisbmatthews/wordpress-docker-compose.git 
+
+#docker-compose up -d 
+
+#docker container ls 
+
+# docker run --name docker-mysql \ 
+ -e MYSQL_ROOT_PASSWORD=secret \ 
+ -e MYSQL_DATABASE=wordpress_db \ 
+ -e MYSQL_USER=wordpress \ 
+ -e MYSQL_PASSWORD=secret \  
+ -d mysql :latest 
+
+
+#docker run --name docker-wordpress -p 8080:80 -d wordpress:latest 
+
+#docker ps 
+
+#docker network create --attachable wordpress-network 
+
+#docker network connect wordpress-network docker-mysql 
+#docker network connect wordpress-network docker-wordpress 
+
+#show databases; 
+#exit 
+
+Lab 3: Creating a Docker image with tags and pushing to a registry enabled with Content Trust
+
+#sudo apt-get update
+
+#sudo apt-get install  apt-transport-https ca-certificates curl gnupg-agent software-properties-common -y
+
+#curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+#sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+
+#sudo apt-get update
+
+#sudo apt install docker-ce -y
+
+#sudo usermod -aG docker $USER
+ 
+#docker --version
+
+#curl -LO https://wordpress.org/latest.zip
+
+Install unzip
+#sudo apt install unzip
+Unzip latest.zip
+#unzip latest.zip
+Move wp-config-sample to wp-config
+#mv wp-config-sample.php wp-config.php
+Enter the wp-config file
+#vi wp-config.php
+Add the code
+#if(!function_exists('getenv_docker')){
+		function getenv_docker($env, $default) {
+			if ($fileEnv = getenv($env . '_FILE')) {
+				return rtrim(file_get_contents($fileEnv), "\r\n");
+			}
+			else if (($val = getenv($env)) !== false) {
+				return $val;
+			}
+			else {
+				return $default;
+			}
+		}
+	}
+
+
+Enter the following code in the variable section
+#define( 'DB_NAME',  getenv_docker('WORDPRESS_DB_NAME', 'wordpress') );
+#define( 'DB_USER', getenv_docker('WORDPRESS_DB_USER', 'example username') );
+#define( 'DB_PASSWORD',  getenv_docker('WORDPRESS_DB_PASSWORD', 'example password') );
+#define( 'DB_HOST', getenv_docker('WORDPRESS_DB_HOST', 'mysql') );
+
+
+Create Dockerfile and paste the content
+#cd wordpress
+#vi Dockerfile
+FROM ubuntu:20.04
+  
+ENV CONTAINER_TIMEZONE="Europe/Brussels"
+RUN ln -snf /usr/share/zoneinfo/$CONTAINER_TIMEZONE /etc/localtime && echo $CONTAINER_TIMEZONE > /etc/timezone
+
+RUN apt update && apt install -y apache2 php php-mysql
+
+ENV APACHE_RUN_USER www-data
+ENV APACHE_RUN_GROUP www-data
+ENV APACHE_LOG_DIR /var/log/apache2
+ENV APACHE_RUN_DIR /var/www/html
+
+RUN echo "ServerName 34.130.105.218" >> /etc/apache2/apache2.conf
+RUN rm -rf /var/www/html/*
+
+VOLUME /var/www/html
+ADD . /var/www/html
+
+RUN chown -R www-data:www-data /var/www/html/*
+
+ENTRYPOINT ["/usr/sbin/apache2"]
+CMD ["-D", "FOREGROUND"]
+Build the docker file
+#docker build -t wordpress-main2 .
+
+#docker pull mysql
+
+# docker run --name docker-mysql \
+ -e MYSQL_ROOT_PASSWORD=secret \
+ -e MYSQL_DATABASE=wordpress_db \
+ -e MYSQL_USER=wordpress \
+ -e MYSQL_PASSWORD=secret -d mysql:latest
+
+# docker run --name wordpress-test3 -dp 8080:80 \
+ -e WORDPRESS_DB_HOST=docker-mysql \
+ -e WORDPRESS_DB_NAME=wordpress_db \
+ -e WORDPRESS_DB_USER=root \
+ -e WORDPRESS_DB_PASSWORD=secret wordpress-main2
+#docker network create --attachable wordpress-network
+#docker network connect wordpress-network docker-mysql
+#docker network connect wordpress-network wordpress-test3
+
+
+#docker volume ls
+
+#docker inspect volumename
+
+#docker inspect volumename
+
+#sudo ls mountpoint
+
+#docker ps
+
+#vi keyfile.json
+
+# cat keyfile.json | docker login -u _json_key --password-stdin https://gcr.io
+
+#docker tag wordpress-local gcr.io/stately-magpie-355709/wordpress-main2:latest
+#docker images
+
+#docker push gcr.io/stately-magpie-355709/wordpress-main:latest
+
+#docker tag mysql gcr.io/stately-magpie-355709/mysql:latest
+
+#docker push gcr.io/stately-magpie-355709/mysql:latest
+
+
+Lab 4: Debugging a container
+
+#docker ps
+
+#docker logs 607e6ebc5235 (containerID)
+
+#docker ps
+
+#docker exec -it 607e6ebc5235 /bin/bash
+#ls
+
+
+#cat wp-config.php
+
+#exit
+
+#docker ps
+
+#docker stats 81a24b4b7f80
+
+Lab 5:  Docker image vulnerability scan
+
+#docker ps
+
+Tag the docker image which you want to push
+#docker tag wordpress gcr.io/dheeraj-practice/wordpress
+
+
+#docker push gcr.io/dheeraj-practice/wordpress
+
+To view vulnerabilities for an image tag or a layer
+gcloud beta container images describe HOSTNAME/PROJECT_ID/IMAGE_ID@sha256:HASH \
+--show-package-vulnerability
+
+
+•	HOSTNAME is the multi-regional hostname:
+•	gcr.io
+•	asia.gcr.io
+•	eu.gcr.io
+•	us.gcr.io
+•	PROJECT_ID is the ID of the project containing the images.
+•	IMAGE_ID is the ID of the image for which you want to view vulnerabilities.
+•	HASH is the image digest.
+#gcloud beta container images describe gcr.io/dheeraj-practice/81a24b4b7f80@sha256:fafa70c1c2b92612c703f57625c9a388215ccd5dd58c279b3f305336549130bc --show-package-vulnerability
+
+
+Vulnerability using filter occurrences:
+#gcloud beta container images list-tags --occurrence-filter='kind="DISCOVERY"' --format=json gcr.io/dheeraj-practice/81a24b4b7f80
+#gcloud beta container images list-tags --occurrence-filter='kind="VULNERABILITY"' --format=json gcr.io/dheeraj-practice/81a24b4b7f80
+
+
+Lab 6a:Setting up Private Docker Registory 
+
+Install Docker
+
+#sudo apt update
+
+#sudo apt-get install apt-transport-https ca-certificates curl software-properties-common -y
+
+#curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add –
+
+#sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu  $(lsb_release -cs)  stable"
+
+#sudo apt update
+
+#sudo apt-get install docker-ce -y
+
+#sudo usermod -aG docker $USER
+
+#sudo systemctl status docker
+
+Install Docker-compose
+
+#sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+#sudo chmod +x /usr/local/bin/docker-compose
+
+#docker-compose –version
+
+Create a directory
+#mkdir docker-registry
+#cd ~/docker-registry
+#mkdir volume
+
+
+#vi vi docker-compose.yml
+Paste the following script
+#version: '3'
+
+services:
+  docker-registry:
+    image: registry:2
+    container_name: docker-registry
+    restart: always
+    ports:
+    - "5000:5000"
+    volumes:
+      - ./volume:/var/lib/registry
+
+  docker-registry-ui:
+    image: konradkleine/docker-registry-frontend:v2
+    container_name: docker-registry-ui
+    restart: always
+    ports:
+    - "8080:80"
+    environment:
+        ENV_DOCKER_REGISTRY_HOST: docker-registry
+        ENV_DOCKER_REGISTRY_PORT: 5000
+
+
+#sudo docker-compose -f docker-compose.yml up -d
+
+Copy the VM IP and add /v2/_catalog and enter in browser with port 5000
+34.130.147.222:5000/v2/_catalog
+
+
+Copy VM IP and enter in browser with port 8080
+34.130.147.222:8080
+
+
+#sudo docker pull hello-world#sudo docker tag hello-world:latest 34.130.147.222:5000/hello-world
+#Sudo su
+#vi /etc/docker/daemon.json
+{
+  "insecure-registries" : ["20.204.80.36:5000"]
+}
+
+
+#sudo service docker stop
+#sudo service docker start
+#sudo systemctl status docker
+
+
+#sudo docker push 34.130.147.222:5000/hello-world
+
+
+
+Refresh and check the browser you will find the repo
+
+#curl -X GET http://34.130.147.222:5000/v2/_catalog
+
+
+Lab 6b: Setting up private Docker Repository
+
+Enabling API through GCP CLI
+# gcloud services enable containerregistry.googleapis.com
+Install Docker
+#sudo apt update
+
+
+#sudo apt-get install apt-transport-https ca-certificates curl software-properties-common -y
+
+
+#curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add –
+
+#sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu  $(lsb_release -cs)  stable"
+
+
+#sudo apt update
+
+#sudo apt-get install docker-ce -y
+
+#sudo usermod -aG docker $USER
+
+#sudo systemctl status docker
+
+Install Docker-compose
+
+#sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+
+#sudo chmod +x /usr/local/bin/docker-compose
+
+#docker-compose –version
+
+#docker ps
+
+Note: How to install WordPress please refer to document “Passing environment variable” in docker advanced Lab2
+#docker images
+
+
+Copy the json keyfile from the service account check with all the permissions
+#vi keyfile.json
+Paste the content of the file downloaded and save
+
+
+Login with the service account
+# cat keyfile.json | docker login -u _json_key --password-stdin https://gcr.io
+
+
+#docker tag wordpress gcr.io/dheeraj-practice/wordpress-registry:latest
+
+#docker push gcr.io/dheeraj-practice/wordpress-registry:latest
+
+
