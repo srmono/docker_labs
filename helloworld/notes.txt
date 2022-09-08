@@ -1,0 +1,13 @@
+Build docker file:
+
+docker build -t helloworld:v1 .
+
+List images:
+docker images
+
+List running containers: 
+docker ps
+
+Run the image:
+
+docker run image_name:tag
