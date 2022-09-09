@@ -1,0 +1,19 @@
+Mount volume directory on docker container
+
+mkdir volume 
+chmod 777 volume [which allow nexus generated data to write from container]
+
+Start nexus locally:
+    docker-compose-up -d
+
+syntax to mount the volume in docker-compose 
+
+On linux machine:
+volumes:
+      - ./volume:/nexus-data
+
+On windows machine: 
+volumes:
+      - //c/path/volume:/nexus-data
+
+ex:- //c/Users/bvsrao/nuxus/volume

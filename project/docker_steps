@@ -45,7 +45,13 @@ Push all docker images to docker hub
 docker push ustapi/cartapi:0.1
 docker push ustapi/frontend:0.1
 docker push ustapi/productapi:0.1
+----------------------------
 
+Update docker-compose file
+
+Launch the app:
+
+    docker-compose up -d 
 
 --------------
 
@@ -54,3 +60,89 @@ Scan docker images for vulnerabilities:
 docker scan imagename
 
 docker scan ustapi/cartapi:0.1
+
+Run the scan by passing the docker file
+docker scan ustapi/frontend:0.1 --file=Dockerfile
+
+----------------------------------------------------------------------
+
+Setting up Private Docker Registry with JFrog Artifactory
+---
+JFrog Artifactory is a universal DevOps solution providing end-to-end automation and management of binaries and artifacts through the application delivery process that improves productivity across your development ecosystem
+---
+Step 1:
+Setup Free account with JFrog Artifactory
+(create account and keep credentials)
+
+    https://jfrog.com/start-free/
+
+Step 2: Select repository under Artifactory
+    Artifactory -> Repository
+
+Step 3: Create Local, Remote and Virtual Repositories
+---
+A "virtual repository" (or “repository group”) aggregates several repositories (local, remote and/or virtual repositories) with the same package type under a common URL.
+
+A "remote repository" serves as a caching proxy for a repository managed at a remote URL (which may itself be another Artifactory remote repository).
+
+A "locally-managed" repository into which you can deploy your artifacts and binaries. This allows you to have a central location to store all of your internal binaries.
+---
+
+Artifactory -> Repository
+
+Click on Add Repository (top right corner)
+    Select Local Repository
+    Select Package Type "Docker"
+    give "Repository Key" : "docker-local" (this will be your local repository name)
+    Leave other options default 
+    Now click on "Create Local Repository" button (bottom right corner)
+
+Repeat the steps to create Remote and Virtual repositories:
+Follow the steps below:
+*** Note: 
+    virtual repository one additional setting to be added. 
+    Refer image attached "virtual-repo.png"
+
+Artifactory -> Repository
+
+Click on Add Repository (top right corner)
+    Select Remote Repository
+    Select Package Type "Docker"
+    give "Repository Key" : "docker-remote" (this will be your remote repository name)
+    Leave other options default 
+    Now click on "Create Remote Repository" button (bottom right corner)
+
+Click on Add Repository (top right corner)
+    Select Virtual Repository
+    Select Package Type "Docker"
+    give "Repository Key" : "docker-virtual" (this will be your virtual repository name)
+    *** Select Default Repository as "docker-local" (from the options available)
+    *** Include repositories from available repos (Refer image attached "virtual-repo.png")
+    Leave other options default 
+    Now click on "Create Virtual Repository" button (bottom right corner)
+
+Creation of private registry of docker completed with JFrog Artifactory. 
+
+Now Lets push images to private repository:
+
+Steps to tag and push docker image to private repository:
+
+Syntax:
+    Login:  docker login [jfrog_repo_url]
+    Tag image: docker tag [your_image_name] [jfrog_repo_url]/[local_repo_name]/[image_name]:[tag_name]
+
+Login: run command from terminal, enter credentials 
+- docker login venkatcloudthat.jfrog.io
+- username: // enter username
+- password: // enter password
+
+Tag your image
+    docker tag hello-world venkatcloudthat.jfrog.io/cloudthat-docker/hello-world
+
+Push to Private Docker registry 
+
+    docker push  venkatcloudthat.jfrog.io/cloudthat-docker/hello-world 
+
+*** now you can use this repo from anywhere
+
+docker pull  venkatcloudthat.jfrog.io/cloudthat-docker/hello-world 
